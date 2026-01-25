@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* DEFAULT (Landing/Learner) - Clean, Playful, Trustworthy */
+    --color-primary: 142 76% 36%;
+    /* Green-600 */
+    --color-secondary: 160 84% 39%;
+    /* Emerald-500 */
+    --color-accent: 38 92% 50%;
+    /* Amber-500 */
+    --color-background: 0 0% 100%;
+    /* White */
+    --color-surface: 210 40% 96.1%;
+    /* Gray-100 */
+    --color-text: 222.2 84% 4.9%;
+    /* Slate-900 */
+    --color-text-muted: 215.4 16.3% 46.9%;
+    /* Slate-500 */
+
+    --color-success: 142 71% 45%;
+    --color-warning: 38 92% 50%;
+    --color-danger: 0 84% 60%;
+    --color-info: 199 89% 48%;
+  }
+
+  /* GAMER THEME - Cyberpunk, Neon, Dark */
+  [data-theme='gamer'] {
+    --color-primary: 280 100% 60%;
+    /* Purple Neon */
+    --color-secondary: 320 100% 60%;
+    /* Pink Neon */
+    --color-accent: 180 100% 50%;
+    /* Cyan Neon */
+    --color-background: 260 50% 10%;
+    /* Deep Purple/Black */
+    --color-surface: 260 40% 15%;
+    /* Darker Purple Surface */
+    --color-text: 210 40% 98%;
+    /* White */
+    --color-text-muted: 260 20% 70%;
+  }
+
+  /* ATHLETE THEME - Precision, Sleek, High Contrast */
+  [data-theme='athlete'] {
+    --color-primary: 220 90% 55%;
+    /* Blue Sport */
+    --color-secondary: 220 10% 20%;
+    /* Dark Gray */
+    --color-accent: 84 100% 50%;
+    /* Lime Green (Highlights) */
+    --color-background: 220 20% 10%;
+    /* Dark Navy/Black */
+    --color-surface: 220 15% 15%;
+    /* Dark Surface */
+    --color-text: 0 0% 100%;
+    --color-text-muted: 220 10% 60%;
+  }
+
+  /* NAVIGATOR THEME - Accessible, Medical, Clear */
+  [data-theme='navigator'] {
+    --color-primary: 200 80% 40%;
+    /* Calming Blue */
+    --color-secondary: 200 20% 90%;
+    /* Light Blue Surface */
+    --color-accent: 0 70% 50%;
+    /* Alert Red (for conditions) */
+    --color-background: 0 0% 98%;
+    /* Off-White (Paper) */
+    --color-surface: 0 0% 100%;
+    /* Pure White */
+    --color-text: 0 0% 10%;
+    /* High contrast black */
+    --color-text-muted: 0 0% 40%;
+  }
+
+  /* DARK MODE - Applied via .dark class on html element */
+  .dark {
+    --color-background: 220 20% 8%;
+    /* Very Dark */
+    --color-surface: 220 15% 12%;
+    /* Dark Surface */
+    --color-text: 210 40% 98%;
+    /* White */
+    --color-text-muted: 215 16% 60%;
+    /* Light Gray */
+  }
+
+  body {
+    @apply bg-background text-text transition-colors duration-300 font-sans;
+  }
+}
