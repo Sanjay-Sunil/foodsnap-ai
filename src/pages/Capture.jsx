@@ -1,18 +1,24 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, X, Zap, RefreshCw } from 'lucide-react';
+import { Camera, X, Zap, RefreshCw, ImagePlus } from 'lucide-react';
 import Button from '../components/ui/Button';
+import { uploadToImgbb } from '../utils/imgbb';
+import { analyzeFood } from '../utils/gemini';
+import { useAuth } from '../context/AuthContext';
 
 const Capture = () => {
   const navigate = useNavigate();
+  const { persona } = useAuth();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  const fileInputRef = useRef(null);
   const [isScanning, setIsScanning] = useState(false);
   const [captured, setCaptured] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
   const [cameraError, setCameraError] = useState(null);
   const [stream, setStream] = useState(null);
+  const [statusMessage, setStatusMessage] = useState('');
 
   // Start camera on mount
   useEffect(() => {
@@ -42,7 +48,7 @@ const Capture = () => {
     }
   };
 
-  const handleCapture = () => {
+  const handleCapture = async () => {
     if (!videoRef.current || !canvasRef.current) return;
 
     const video = videoRef.current;
@@ -67,11 +73,39 @@ const Capture = () => {
       stream.getTracks().forEach(track => track.stop());
     }
 
-    // Simulate AI processing time, then navigate
-    setTimeout(() => {
-      // In a real app, you'd pass the image to the analysis page
-      navigate('/analysis', { state: { image: imageDataUrl } });
-    }, 3000);
+    try {
+      // Step 1: Upload to imgbb
+      setStatusMessage('Uploading image...');
+      const imgbbResponse = await uploadToImgbb(imageDataUrl);
+      const imageUrl = imgbbResponse?.data?.url;
+      console.log('Uploaded image URL:', imageUrl);
+
+      if (!imageUrl) {
+        throw new Error('Failed to get image URL from imgbb');
+      }
+
+      // Step 2: Analyze with Gemini
+      setStatusMessage('Gemini Analyzing...');
+      const mealHistory = 'No previous meals logged today'; // TODO: Get from user context
+      const analysisResult = await analyzeFood(imageUrl, persona || 'learner', mealHistory);
+      console.log('Gemini analysis:', analysisResult);
+
+      // Step 3: Navigate to analysis page with all data
+      navigate('/analysis', {
+        state: {
+          image: imageDataUrl,
+          imageUrl: imageUrl,
+          analysis: analysisResult
+        }
+      });
+    } catch (error) {
+      console.error('Failed to process image:', error);
+      setStatusMessage('Error processing image');
+      // Still navigate with local image if something fails
+      setTimeout(() => {
+        navigate('/analysis', { state: { image: imageDataUrl, error: error.message } });
+      }, 1500);
+    }
   };
 
   const handleRetake = () => {
@@ -81,10 +115,81 @@ const Capture = () => {
     startCamera();
   };
 
+  // Handle file upload from device
+  const handleFileUpload = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const imageDataUrl = e.target.result;
+      setCapturedImage(imageDataUrl);
+      setCaptured(true);
+      setIsScanning(true);
+
+      // Stop camera stream if running
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+
+      try {
+        // Step 1: Upload to imgbb
+        setStatusMessage('Uploading image...');
+        const imgbbResponse = await uploadToImgbb(imageDataUrl);
+        const imageUrl = imgbbResponse?.data?.url;
+        console.log('Uploaded image URL:', imageUrl);
+
+        if (!imageUrl) {
+          throw new Error('Failed to get image URL from imgbb');
+        }
+
+        // Step 2: Analyze with Gemini
+        setStatusMessage('Gemini Analyzing...');
+        const mealHistory = 'No previous meals logged today';
+        const analysisResult = await analyzeFood(imageUrl, persona || 'learner', mealHistory);
+        console.log('Gemini analysis:', analysisResult);
+
+        // Step 3: Navigate to analysis page with all data
+        navigate('/analysis', {
+          state: {
+            image: imageDataUrl,
+            imageUrl: imageUrl,
+            analysis: analysisResult
+          }
+        });
+      } catch (error) {
+        console.error('Failed to process image:', error);
+        setStatusMessage('Error processing image');
+        setTimeout(() => {
+          navigate('/analysis', { state: { image: imageDataUrl, error: error.message } });
+        }, 1500);
+      }
+    };
+    reader.readAsDataURL(file);
+
+    // Reset file input
+    event.target.value = '';
+  };
+
   return (
     <div className="min-h-screen bg-black relative flex flex-col">
       {/* Hidden canvas for capturing frame */}
       <canvas ref={canvasRef} className="hidden" />
+
+      {/* Hidden file input for uploading from device */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept="image/*"
+        onChange={handleFileUpload}
+        className="hidden"
+      />
 
       {/* Camera Viewfinder */}
       <div className="flex-1 relative overflow-hidden bg-gray-900">
@@ -143,7 +248,7 @@ const Capture = () => {
                   transition={{ repeat: Infinity, duration: 1 }}
                   className="bg-black/50 backdrop-blur-md text-primary font-mono px-4 py-2 rounded-full border border-primary/50"
                 >
-                  Gemini Analyzing...
+                  {statusMessage || 'Gemini Analyzing...'}
                 </motion.div>
               </div>
             </motion.div>
@@ -175,8 +280,13 @@ const Capture = () => {
           </button>
         )}
 
-        <Button variant="ghost" className="rounded-full w-12 h-12 p-0 text-white">
-          <Zap className="w-6 h-6" />
+        <Button
+          variant="ghost"
+          className="rounded-full w-12 h-12 p-0 text-white"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isScanning}
+        >
+          <ImagePlus className="w-6 h-6" />
         </Button>
       </div>
     </div>
