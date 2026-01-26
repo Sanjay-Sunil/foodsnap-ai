@@ -4,7 +4,7 @@
  * @returns {Promise<Object>} - The imgbb API response JSON
  */
 export const uploadToImgbb = async (base64Image) => {
-  const API_KEY = '7099a56971e1a7afff04ea2e1dd494a2';
+  const API_KEY = import.meta.env.VITE_IMGBB_API_KEY;
 
   // Remove the data URL prefix if present (e.g., "data:image/jpeg;base64,")
   const base64Data = base64Image.includes(',')
