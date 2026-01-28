@@ -7,7 +7,7 @@
  */
 export const analyzeFood = async (imageUrl, persona = 'learner', mealHistory = 'No meal history available') => {
   const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
 
   // Map persona to descriptive text
   const personaDescriptions = {
@@ -19,75 +19,45 @@ export const analyzeFood = async (imageUrl, persona = 'learner', mealHistory = '
 
   const personaContext = personaDescriptions[persona] || personaDescriptions.learner;
 
-  const prompt = `**System Instruction:**
-You are a professional nutrition AI assistant. Your task is to analyze the provided image of a meal and return a structured JSON response.
+  const prompt = `System: Nutrition AI Analyst. Analyze meal image and context. Return structured JSON.
 
-**Task Requirements:**
-1. **Identify Items:** List every distinct food and beverage item visible in the image.
-2. **Standardize Names:** Provide a 'search_term' for each item that is optimized for lookup in the Edamam or USDA Nutrition API (e.g., use "Grilled Chicken Breast" instead of "chicken").
-3. **Estimate Quantity:** Estimate the weight (grams) or volume (ml) using visual context, plate size, and common portion sizes. Be specific and realistic.
-4. **Identify Hidden Ingredients:** Look for textures, shine, or visual cues that imply "invisible" calories (e.g., oil, butter, heavy cream, sugar dressings, cheese, sauces).
-5. **Personalized Logic:** Apply the user's Persona and Meal History to provide tailored suggestions and alerts.
+REQUIRED TASKS:
+1. List food/beverage items.
+2. Optimize 'search_term' for APIs (e.g., "Grilled Salmon" not "fish").
+3. Estimate grams/ml using visual cues (plate size, thickness).
+4. Detect hidden calories (oils, dressings, butter, sugar) from shine/texture.
+5. Provide feedback based on Persona/History.
 
-**Visual Analysis Guidelines:**
-- Use the plate as a reference for portion estimation (standard dinner plate ~25cm diameter)
-- Look for oil sheen on foods indicating frying or added fats
-- Check for visible sauces, dressings, or toppings
-- Estimate density and thickness of food items
-- Consider cooking methods based on appearance (grilled, fried, steamed, etc.)
-
-**User Context:**
+CONTEXT:
 - Persona: ${personaContext}
-- Meal History: ${mealHistory}
-- Image Source: ${imageUrl}
+- History: ${mealHistory}
 
-**CRITICAL: If the image does NOT contain food items, return this exact JSON:**
+SCHEMA:
 {
-  "error": true,
-  "message": "No food items detected in the image. Please capture a clear photo of your meal.",
-  "detected_items": [],
-  "hidden_additions": [],
-  "persona_feedback": null,
-  "summary": null
-}
-
-**Output Format (STRICT JSON ONLY - No markdown, no code blocks, just pure JSON):**
-{
-  "detected_items": [
-    {
-      "food_item": "string (common name)",
-      "search_term": "string (API-friendly, specific)",
-      "quantity": integer (grams for solids, ml for liquids),
-      "unit": "string (g or ml)",
-      "confidence": float (0.0 to 1.0),
-      "visual_description": "string (color, texture, cooking method observed)",
-      "estimated_calories": integer,
-      
-    }
-  ],
-  "hidden_additions": [
-    { 
-      "item": "string", 
-      "estimated_amount": "string",
-      "reason": "string (visual cue that suggests this)" 
-    }
-  ],
-  "persona_feedback": {
-    "suggestion": "string (personalized advice based on persona)",
-    "alert": "string or null (Red flag if medical condition requires it, especially for Navigator)",
-    "motivation": "string (encouraging message, gamified for Gamer persona)"
-  },
+  "detected_items": [{
+    "food_item": "name",
+    "search_term": "api_name",
+    "quantity": integer,
+    "unit": "g/ml",
+    "confidence": 0-1,
+    "visual_description": "text",
+    "estimated_calories": integer
+  }],
+  "hidden_additions": [{ "item": "name", "reason": "cue" }],
+  "persona_feedback": { "suggestion": "text", "alert": "text/null", "motivation": "text" },
   "summary": {
     "estimated_total_calories": integer,
-    "meal_type": "string (breakfast/lunch/dinner/snack)",
+    "meal_type": "text",
     "protein_estimate_g": integer,
     "carbs_estimate_g": integer,
     "fat_estimate_g": integer,
-    "health_score": integer (1-10 based on nutritional balance)
+    "health_score": 1-10
   }
 }
 
-IMPORTANT: Return ONLY valid JSON. No explanations, no markdown formatting, no code blocks. Just the raw JSON object.`;
+IF NO FOOD: Return {"error": true, "message": "No food detected", "detected_items": []}
+
+STRICT: ONLY raw JSON. No markdown.`;
 
   try {
     const response = await fetch(API_URL, {
@@ -108,10 +78,11 @@ IMPORTANT: Return ONLY valid JSON. No explanations, no markdown formatting, no c
           ]
         }],
         generationConfig: {
-          temperature: 0.4,
+          temperature: 0.2,
           topK: 32,
           topP: 1,
-          maxOutputTokens: 4096
+          maxOutputTokens: 8192,
+          responseMimeType: 'application/json'
         }
       })
     });

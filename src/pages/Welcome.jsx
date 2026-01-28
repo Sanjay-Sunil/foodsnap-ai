@@ -58,11 +58,11 @@ const Welcome = () => {
 
         {/* Simulated Feature Cards */}
         <motion.div variants={itemVariants} className="grid grid-cols-2 gap-3 py-6">
-          <div className="p-4 bg-white/50 backdrop-blur-md rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center gap-2">
+          <div className="p-4 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm flex flex-col items-center gap-2 transition-colors">
             <Zap className="w-6 h-6 text-accent" />
             <span className="text-sm font-medium text-text-muted">Instant Analysis</span>
           </div>
-          <div className="p-4 bg-white/50 backdrop-blur-md rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center gap-2">
+          <div className="p-4 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm flex flex-col items-center gap-2 transition-colors">
             <Activity className="w-6 h-6 text-primary" />
             <span className="text-sm font-medium text-text-muted">Smart Tracking</span>
           </div>
