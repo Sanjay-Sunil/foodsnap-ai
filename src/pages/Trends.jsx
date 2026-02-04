@@ -1,6 +1,7 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import BottomNav from '../components/BottomNav';
 import { useAuth } from '../context/AuthContext';
+import TopBar from '../components/TopBar';
 
 const Trends = () => {
   const { persona } = useAuth();
@@ -15,11 +16,11 @@ const Trends = () => {
     { name: 'Sun', cal: 2100, pro: 145 },
   ];
 
-  const activeColor = persona === 'gamer' ? '#a855f7' : '#10b981'; // Purple vs Green
+  const activeColor = '#10b981'; // Standard Emerald Green
 
   return (
     <div className="min-h-screen p-6 space-y-8 pb-24">
-      <h1 className="text-3xl font-bold">Weekly Trends</h1>
+      <TopBar title="Weekly Trends" />
 
       <div className="bg-surface p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 h-80">
         <h3 className="text-lg font-semibold mb-6">Calorie Intake</h3>

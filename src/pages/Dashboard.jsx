@@ -1,12 +1,36 @@
+import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import BottomNav from '../components/BottomNav';
-import { Camera, AlertTriangle, Zap, TrendingUp, Activity } from 'lucide-react';
-import Button from '../components/ui/Button';
-import ThemeToggle from '../components/ui/ThemeToggle';
+import { Camera, AlertTriangle, TrendingUp, Activity } from 'lucide-react';
+import TopBar from '../components/TopBar';
+import { getUserPreferences } from '../utils/firebase';
 
 const Dashboard = () => {
-  const { user, persona } = useAuth();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchAndLogPreferences = async () => {
+      if (user?.uid) {
+        try {
+          // If selections aren't in memory, fetch from RTDB
+          const prefs = await getUserPreferences(user.uid);
+          if (prefs) {
+            console.log("--- Dashboard User Preferences Log ---");
+            console.log("Raw Preferences from RTDB:", prefs);
+            console.log("Flattened Selections Array:", prefs.selections || "No selections array found");
+            console.log("---------------------------------------");
+          } else {
+            console.log("No preferences found in RTDB for user:", user.uid);
+          }
+        } catch (err) {
+          console.error("Error fetching preferences for logging:", err);
+        }
+      }
+    };
+
+    fetchAndLogPreferences();
+  }, [user?.uid]);
 
   // Mock Data
   const dailyStats = {
@@ -17,62 +41,21 @@ const Dashboard = () => {
     fat: 45
   };
 
-  // Persona Content Config
-  const personaConfig = {
-    gamer: {
-      greeting: "Welcome back, Player!",
-      statsTitle: "Daily XP",
-      cardStyle: "border-primary bg-black/40",
-      icon: Zap
-    },
-    learner: {
-      greeting: "Ready to learn?",
-      statsTitle: "Nutrition Balance",
-      cardStyle: "bg-emerald-50 border-emerald-100 dark:bg-emerald-950/30",
-      icon: TrendingUp
-    },
-    athlete: {
-      greeting: "Let's hit those macros.",
-      statsTitle: "Fuel Tank",
-      cardStyle: "bg-slate-900 border-slate-800 text-white",
-      icon: Activity
-    },
-    navigator: {
-      greeting: "Health Monitor Active",
-      statsTitle: "Daily Limit",
-      cardStyle: "bg-blue-50 border-blue-100 dark:bg-blue-950/20",
-      icon: Activity
-    }
-  };
-
-  const config = personaConfig[persona] || personaConfig.learner;
   const progress = (dailyStats.calories / dailyStats.goal) * 100;
 
   return (
     <div className="min-h-screen p-6 space-y-8 pb-24">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{config.greeting}</h1>
-          <p className="text-text-muted">{user?.name || "Guest"}</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-            <span className="text-xl font-bold text-primary">{user?.name?.[0] || "U"}</span>
-          </div>
-        </div>
-      </div>
+      <TopBar title={`Welcome, ${user?.name || 'User'}`} />
 
       {/* Main Stats Card */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className={`p-6 rounded-3xl border shadow-sm relative overflow-hidden ${config.cardStyle}`}
+        className="p-6 rounded-3xl border border-gray-100 dark:border-white/5 bg-white/80 dark:bg-zinc-900/50 backdrop-blur-xl shadow-xl shadow-black/[0.03] relative overflow-hidden"
       >
         <div className="flex justify-between items-start mb-4">
-          <h3 className="font-semibold text-lg opacity-90">{config.statsTitle}</h3>
-          <config.icon className="w-6 h-6 text-primary" />
+          <h3 className="font-semibold text-lg opacity-90">Daily Nutrition</h3>
+          <Activity className="w-6 h-6 text-primary" />
         </div>
 
         <div className="flex items-end gap-2 mb-2">
@@ -119,7 +102,7 @@ const Dashboard = () => {
                 <p className="text-sm text-text-muted">Lunch • 450 kcal</p>
               </div>
               {/* Conditional Rendering for Navigator Persona */}
-              {persona === 'navigator' && i === 1 && (
+              {i === 1 && (
                 <div className="flex flex-col items-end text-right">
                   <AlertTriangle className="w-5 h-5 text-warning" />
                   <span className="text-[10px] text-warning font-medium">Sodium High</span>
@@ -134,6 +117,5 @@ const Dashboard = () => {
     </div>
   );
 };
-
 
 export default Dashboard;

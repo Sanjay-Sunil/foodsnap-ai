@@ -4,13 +4,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Check, Info, AlertTriangle, Loader2, TrendingUp, Utensils, Target, Camera } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import Button from '../components/ui/Button';
-import ThemeToggle from '../components/ui/ThemeToggle';
 import { useAuth } from '../context/AuthContext';
+import TopBar from '../components/TopBar';
 
 const Analysis = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { persona } = useAuth();
+  const { user } = useAuth();
 
   const { image, imageUrl, analysis } = location.state || {};
 
@@ -33,14 +33,12 @@ const Analysis = () => {
   const summary = analysis.summary || {};
   const feedback = analysis.persona_feedback || {};
 
-  // Chart Data Preparation
   const chartData = [
     { name: 'Protein', value: summary.protein_estimate_g || 0, color: '#3B82F6' },
     { name: 'Carbs', value: summary.carbs_estimate_g || 0, color: '#F59E0B' },
     { name: 'Fat', value: summary.fat_estimate_g || 0, color: '#EF4444' },
   ].filter(item => item.value > 0);
 
-  // Health color helper
   const getCalorieColor = (calories, confidence) => {
     if (!confidence || confidence > 0.8) {
       if (calories < 200) return 'text-emerald-500 bg-emerald-500/10';
@@ -50,7 +48,6 @@ const Analysis = () => {
     return 'text-text-muted bg-surface';
   };
 
-  // Match color helper
   const getMatchColor = (confidence) => {
     if (confidence > 0.8) return 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]';
     if (confidence > 0.5) return 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]';
@@ -59,25 +56,9 @@ const Analysis = () => {
 
   return (
     <div className="min-h-screen bg-surface p-6 pb-24 font-sans text-text transition-all duration-500">
-      {/* Header View */}
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Food Scan</h1>
-          <p className="text-text-muted flex items-center gap-2 mt-1">
-            <TrendingUp className="w-4 h-4 text-emerald-500" />
-            AI Analysis Ready
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
-            <Utensils className="w-6 h-6" />
-          </div>
-        </div>
-      </div>
+      <TopBar title="Food Scan" showBack={true} />
 
       <div className="space-y-6">
-        {/* TOP SECTION: OVERALL DATA & GRAPH */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -86,7 +67,6 @@ const Analysis = () => {
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
           <div className="flex flex-col md:flex-row items-center gap-8">
-            {/* Chart */}
             <div className="w-full h-48 md:w-48 relative">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -117,7 +97,6 @@ const Analysis = () => {
               </div>
             </div>
 
-            {/* Micro Stats */}
             <div className="flex-1 grid grid-cols-2 gap-4 w-full">
               <div className="p-4 rounded-2xl bg-surface border border-black/5 flex flex-col">
                 <span className="text-xs font-semibold text-text-muted mb-1 flex items-center gap-1">
@@ -147,7 +126,6 @@ const Analysis = () => {
           </div>
         </motion.div>
 
-        {/* MIDDLE SECTION: HEALTH ALERT & SUGGESTIONS */}
         {(feedback.alert || feedback.suggestion) && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -180,7 +158,6 @@ const Analysis = () => {
           </motion.div>
         )}
 
-        {/* OPTIONAL: Captured Image Reference */}
         {imageUrl || image ? (
           <motion.div
             initial={{ opacity: 0 }}
@@ -198,7 +175,6 @@ const Analysis = () => {
           </motion.div>
         ) : null}
 
-        {/* BOTTOM SECTION: DETECTED ITEMS */}
         <div className="space-y-4 pt-4">
           <div className="flex justify-between items-center px-1">
             <h3 className="font-bold text-xl flex items-center gap-2">
@@ -245,7 +221,6 @@ const Analysis = () => {
           </div>
         </div>
 
-        {/* Action Button */}
         <div className="pt-4">
           <Button onClick={() => navigate('/dashboard')} className="w-full h-16 rounded-2xl text-lg font-bold shadow-2xl shadow-primary/20 group relative overflow-hidden">
             <div className="absolute inset-0 bg-white/10 opacity-0 group-active:opacity-100 transition-opacity" />
@@ -266,4 +241,3 @@ const Analysis = () => {
 };
 
 export default Analysis;
-

@@ -68,14 +68,40 @@ const Welcome = () => {
           </div>
         </motion.div>
 
-        {/* Actions */}
+        {/* Actions / Quick Start Form */}
         <motion.div variants={itemVariants} className="space-y-4 pt-4">
-          <Button
-            onClick={() => navigate('/login')}
-            className="w-full text-lg h-14"
+          <form
+            className="flex flex-col gap-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const email = e.target.email.value;
+              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+              if (!email) {
+                // Silent failure or simple alert if no toast system
+                return;
+              }
+              if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address');
+                return;
+              }
+              navigate(`/register?email=${encodeURIComponent(email)}`);
+            }}
           >
-            Get Started <ChevronRight className="ml-2 w-5 h-5" />
-          </Button>
+            <div className="relative group">
+              <input
+                name="email"
+                type="email"
+                placeholder="Enter your email"
+                className="w-full h-14 pl-5 pr-4 rounded-2xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md border border-gray-100 dark:border-zinc-800 focus:ring-2 focus:ring-primary outline-none transition-all text-lg"
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full text-lg h-14"
+            >
+              Get Started <ChevronRight className="ml-2 w-5 h-5" />
+            </Button>
+          </form>
 
           <p className="text-sm text-text-muted">
             Already have an account? <span onClick={() => navigate('/login')} className="text-primary font-medium cursor-pointer hover:underline">Log in</span>
