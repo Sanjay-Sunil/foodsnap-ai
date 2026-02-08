@@ -31,7 +31,7 @@ const Trends = () => {
               dataKey="name"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 12, fill: 'var(--color-text-muted)' }}
+              tick={{ fontSize: 12, fill: 'hsl(var(--color-text))' }}
               dy={10}
             />
             <Tooltip
