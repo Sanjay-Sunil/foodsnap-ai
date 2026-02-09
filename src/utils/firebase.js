@@ -11,7 +11,7 @@ import {
   updateProfile,
   onAuthStateChanged
 } from "firebase/auth";
-import { getDatabase, ref, set, get } from "firebase/database";
+import { getDatabase, ref, set, get, push } from "firebase/database";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -65,6 +65,12 @@ export const getUserPreferences = async (userId) => {
   const userRef = ref(db, `user/${userId}/preferences`);
   const snapshot = await get(userRef);
   return snapshot.exists() ? snapshot.val() : null;
+};
+
+export const logMeal = async (userId, mealData) => {
+  const mealsRef = ref(db, `meals/${userId}`);
+  const newMealRef = push(mealsRef);
+  return set(newMealRef, mealData);
 };
 
 export { app, auth, googleProvider, onAuthStateChanged, db };

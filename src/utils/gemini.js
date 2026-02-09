@@ -41,23 +41,26 @@ SCHEMA:
     "unit": "g/ml",
     "confidence": 0-1,
     "visual_description": "text",
-    "estimated_calories": integer
+    "estimated_calories": integer,
+    "protein_g": float,
+    "carbs_g": float,
+    "fat_g": float
   }],
   "hidden_additions": [{ "item": "name", "reason": "cue" }],
   "persona_feedback": { "suggestion": "text", "alert": "text/null", "motivation": "text" },
   "summary": {
-    "estimated_total_calories": integer,
+    "estimated_total_calories": float,
     "meal_type": "text",
-    "protein_estimate_g": integer,
-    "carbs_estimate_g": integer,
-    "fat_estimate_g": integer,
+    "protein_estimate_g": float,
+    "carbs_estimate_g": float,
+    "fat_estimate_g": float,
     "health_score": 1-10
   }
 }
 
 IF NO FOOD: Return {"error": true, "message": "No food detected", "detected_items": []}
 
-STRICT: ONLY raw JSON. No markdown.`;
+STRICT: ONLY raw JSON. No markdown. Use numbers for all nutrient fields.`;
 
   try {
     const response = await fetch(API_URL, {

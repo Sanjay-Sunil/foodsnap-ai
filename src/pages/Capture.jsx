@@ -5,6 +5,7 @@ import { Camera, X, Zap, RefreshCw, ImagePlus } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { uploadToImgbb } from '../utils/imgbb';
 import { analyzeFood } from '../utils/gemini';
+import { fetchNutritionalDetails } from '../utils/nutrition';
 import { useAuth } from '../context/AuthContext';
 
 const Capture = () => {
@@ -90,7 +91,18 @@ const Capture = () => {
       const analysisResult = await analyzeFood(imageUrl, persona || 'learner', mealHistory);
       console.log('Gemini analysis:', analysisResult);
 
-      // Step 3: Navigate to analysis page with all data
+      // Step 3: Enriched analysis with Spoonacular
+      if (analysisResult.detected_items && analysisResult.detected_items.length > 0) {
+        setStatusMessage('Fetching nutritional details...');
+        const { items, summary } = await fetchNutritionalDetails(analysisResult.detected_items);
+        analysisResult.detected_items = items;
+        // Merge Spoonacular summary into the Gemini summary if successful
+        if (summary) {
+          analysisResult.summary = { ...analysisResult.summary, ...summary };
+        }
+      }
+
+      // Step 4: Navigate to analysis page with all data
       navigate('/analysis', {
         state: {
           image: imageDataUrl,
@@ -155,7 +167,17 @@ const Capture = () => {
         const analysisResult = await analyzeFood(imageUrl, persona || 'learner', mealHistory);
         console.log('Gemini analysis:', analysisResult);
 
-        // Step 3: Navigate to analysis page with all data
+        // Step 3: Enriched analysis with Spoonacular
+        if (analysisResult.detected_items && analysisResult.detected_items.length > 0) {
+          setStatusMessage('Fetching nutritional details...');
+          const { items, summary } = await fetchNutritionalDetails(analysisResult.detected_items);
+          analysisResult.detected_items = items;
+          if (summary) {
+            analysisResult.summary = { ...analysisResult.summary, ...summary };
+          }
+        }
+
+        // Step 4: Navigate to analysis page with all data
         navigate('/analysis', {
           state: {
             image: imageDataUrl,
