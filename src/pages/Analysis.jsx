@@ -282,11 +282,6 @@ const Analysis = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-2 mt-4 sm:hidden border-t border-black/5 pt-3">
-                  <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-500/5 text-blue-600 dark:text-blue-400 rounded-md">Protein: {(item.protein_g || 0).toFixed(2)}g</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 bg-amber-500/5 text-amber-600 dark:text-amber-400 rounded-md">Carbs: {(item.carbs_g || 0).toFixed(2)}g</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 bg-rose-500/5 text-rose-600 dark:text-rose-400 rounded-md">Fat: {(item.fat_g || 0).toFixed(2)}g</span>
-                </div>
               </motion.div>
             ))}
           </div>
@@ -316,8 +311,7 @@ const Analysis = () => {
           </button>
         </div>
       </div>
-    </div>
-  );
+      );
 };
 
-export default Analysis;
+      export default Analysis;

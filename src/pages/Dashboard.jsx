@@ -143,8 +143,8 @@ const Dashboard = () => {
                   layout
                   onClick={() => toggleAccordion(meal.id)}
                   className={`relative overflow-hidden cursor-pointer p-5 rounded-3xl border transition-all duration-300 ${expandedMeal === meal.id
-                      ? 'bg-white dark:bg-zinc-900 shadow-lg border-black/5'
-                      : 'bg-white/50 dark:bg-zinc-900/50 hover:bg-white dark:hover:bg-zinc-900 border-transparent hover:border-black/5'
+                    ? 'bg-white dark:bg-zinc-900 shadow-lg border-black/5'
+                    : 'bg-white/50 dark:bg-zinc-900/50 hover:bg-white dark:hover:bg-zinc-900 border-transparent hover:border-black/5'
                     }`}
                 >
                   <div className="flex items-center gap-4">
@@ -176,22 +176,22 @@ const Dashboard = () => {
                       </div>
 
                       {/* Nutrient Summary Row */}
-                      <div className="flex gap-3 mt-3">
-                        <div className="flex items-center gap-1">
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        <div className="flex items-center gap-1.5 bg-black/[0.03] dark:bg-white/[0.03] px-2 py-1 rounded-lg border border-black/5 dark:border-white/5">
                           <div className={`w-1.5 h-1.5 rounded-full ${getScoreDotColor(meal.overall_breakdown?.health_score || 0)}`} />
-                          <span className="text-[10px] font-bold opacity-70 uppercase tracking-wide">
+                          <span className="text-[10px] font-black opacity-60 uppercase tracking-tighter">
                             {meal.overall_breakdown?.total_calories?.toFixed(0)} kcal
                           </span>
                         </div>
-                        <div className="text-[10px] font-bold opacity-30">•</div>
-                        <div className="text-[10px] font-bold opacity-50 uppercase tracking-wide">
-                          P: {meal.overall_breakdown?.total_protien?.toFixed(0)}g
+
+                        <div className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-lg uppercase tracking-tighter shadow-sm shadow-emerald-500/5">
+                          Protein: {meal.overall_breakdown?.total_protien?.toFixed(0)}g
                         </div>
-                        <div className="text-[10px] font-bold opacity-50 uppercase tracking-wide">
-                          C: {meal.overall_breakdown?.total_carbs?.toFixed(0)}g
+                        <div className="text-[10px] font-black text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-1 rounded-lg uppercase tracking-tighter shadow-sm shadow-amber-500/5">
+                          Carbs: {meal.overall_breakdown?.total_carbs?.toFixed(0)}g
                         </div>
-                        <div className="text-[10px] font-bold opacity-50 uppercase tracking-wide">
-                          F: {meal.overall_breakdown?.total_fats?.toFixed(0)}g
+                        <div className="text-[10px] font-black text-rose-600 dark:text-rose-400 bg-rose-500/10 px-2 py-1 rounded-lg uppercase tracking-tighter shadow-sm shadow-rose-500/5">
+                          Fats: {meal.overall_breakdown?.total_fats?.toFixed(0)}g
                         </div>
                       </div>
                     </div>
