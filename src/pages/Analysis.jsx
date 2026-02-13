@@ -50,17 +50,21 @@ const Analysis = () => {
     try {
       const now = new Date();
       const mealData = {
-        timestamp: now.getTime(),
-        date: now.toLocaleDateString(),
-        day: now.toLocaleDateString('en-US', { weekday: 'long' }),
-        meal_type: getMealType(),
-        image_url: imageUrl || image,
-        total_calories: summary.estimated_total_calories,
-        total_protein: summary.protein_estimate_g,
-        total_carbs: summary.carbs_estimate_g,
-        total_fat: summary.fat_estimate_g,
-        health_score: summary.health_score,
-        items: detectedItems,
+        details: {
+          time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          date: now.toLocaleDateString(),
+          day: now.toLocaleDateString('en-US', { weekday: 'long' }),
+          'image-url': imageUrl || image,
+          'meal-type': getMealType(),
+        },
+        overall_breakdown: {
+          total_calories: summary.estimated_total_calories,
+          total_carbs: summary.carbs_estimate_g,
+          total_fats: summary.fat_estimate_g,
+          health_score: summary.health_score,
+          total_protien: summary.protein_estimate_g,
+        },
+        item: detectedItems,
       };
 
       await logMeal(user.uid, mealData);

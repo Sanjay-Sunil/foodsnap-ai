@@ -73,4 +73,10 @@ export const logMeal = async (userId, mealData) => {
   return set(newMealRef, mealData);
 };
 
+export const getMealHistory = async (userId) => {
+  const mealsRef = ref(db, `meals/${userId}`);
+  const snapshot = await get(mealsRef);
+  return snapshot.exists() ? snapshot.val() : null;
+};
+
 export { app, auth, googleProvider, onAuthStateChanged, db };
