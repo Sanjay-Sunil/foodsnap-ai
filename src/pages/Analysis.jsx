@@ -311,7 +311,8 @@ const Analysis = () => {
           </button>
         </div>
       </div>
-      );
+    </div>
+  );
 };
 
-      export default Analysis;
+export default Analysis;
